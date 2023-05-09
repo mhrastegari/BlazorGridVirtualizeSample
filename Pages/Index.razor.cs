@@ -8,15 +8,16 @@ namespace BlazorGridVirtualizeSample.Pages;
 
 public partial class Index
 {
-    [Inject] private IJSRuntime JSRuntime { get; set; }
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+
     public int WindowWidth { get; set; }
 
-    private int _gridRowCount = 3;
+    private int _gridColumnCount = 3;
     private int _overScanCount = 5;
     private string _resizeEventListenerId = string.Empty;
 
     private DotNetObjectReference<Index>? _dotnetObjectReference;
-    private Virtualize<Person[]> _virtualizeGridRef;
+    private Virtualize<Person[]>? _virtualizeGridRef;
     private List<Person> People = new();
 
     protected override async Task OnInitializedAsync()
@@ -59,7 +60,7 @@ public partial class Index
     public void UpdateWindowWidth(int windowWidth)
     {
         WindowWidth = windowWidth;
-        UpdateGridRowCount(WindowWidth);
+        UpdateGridColumnCount(WindowWidth);
         StateHasChanged();
     }
 
@@ -69,7 +70,7 @@ public partial class Index
         await JSRuntime.InvokeVoidAsync("AddWindowWidthListener", _dotnetObjectReference, _resizeEventListenerId);
     }
 
-    public void UpdateGridRowCount(int windowWidth)
+    public void UpdateGridColumnCount(int windowWidth)
     {
         int spacing = 4;
         int actualItemSize = 150;
@@ -77,8 +78,8 @@ public partial class Index
 
         if (windowWidth > gridItemSize)
         {
-            _gridRowCount = windowWidth / gridItemSize;
-            _virtualizeGridRef.RefreshDataAsync();
+            _gridColumnCount = windowWidth / gridItemSize;
+            _virtualizeGridRef?.RefreshDataAsync();
         }
 
         StateHasChanged();
@@ -89,15 +90,15 @@ public partial class Index
         var cancellationToken = request.CancellationToken;
         if (cancellationToken.IsCancellationRequested) return default;
 
-        var count = request.Count * _gridRowCount;
-        var start = request.StartIndex * _gridRowCount;
+        var count = request.Count * _gridColumnCount;
+        var start = request.StartIndex * _gridColumnCount;
         var requestCount = Math.Min(count, People.Count - start);
 
         var items = People.Skip(start).Take(requestCount).ToList();
 
-        var result = items.Chunk(_gridRowCount).ToList();
+        var result = items.Chunk(_gridColumnCount).ToList();
 
         return new ItemsProviderResult<Person[]>(items: result,
-            totalItemCount: (int)Math.Ceiling((decimal)People.Count / _gridRowCount));
+            totalItemCount: (int)Math.Ceiling((decimal)People.Count / _gridColumnCount));
     }
 }
