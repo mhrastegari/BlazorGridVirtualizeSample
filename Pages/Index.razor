@@ -1,2 +1,27 @@
 ﻿@page "/"
 
+<div>
+    <h1>Blazor Virtualize - GridView Sample</h1>
+
+    <Virtualize Context="People"
+                OverscanCount="@_overScanCount"
+                ItemsProvider="@ProvideGridItemsAsync"
+                @ref="_virtualizeGridRef">
+        <div style="display: flex">
+            @foreach (var person in People)
+            {
+                <div style="margin:2px;
+                        width: 150px;
+                        height: 150px;
+                        min-width: 150px;
+                        display: flex;
+                        color: white;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: #512BD4;">
+                    @person.Id
+                </div>
+            }
+        </div>
+    </Virtualize>
+</div>
